@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriBorrow System - Agricultural Equipment Management</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS File Link -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#F9FBF8] text-[#1E3A2B] font-['Inter'] antialiased min-h-screen flex flex-col">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-[#A5D6A7]/40 sticky top-0 z-30 h-16 flex items-center justify-between px-4 md:px-6 shadow-sm">
+        <div class="flex items-center space-x-3">
+            <button onclick="toggleSidebar()" class="md:hidden text-[#2E7D32] hover:bg-[#E8F5E9] p-2 rounded-lg transition">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="bg-[#E8F5E9] p-2 rounded-xl text-[#2E7D32] border border-[#A5D6A7]">
+                    <i class="fa-solid fa-[#2E7D32] fa-wheat-awn text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base md:text-lg text-[#1B5E20] leading-tight">AgriBorrow System</h1>
+                    <p class="text-[10px] text-[#2E7D32]/70 font-medium">Equipment Scheduling & Management</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Search Bar & User Profile -->
+        <div class="flex items-center space-x-4">
+            <div class="relative hidden sm:block w-48 md:w-64">
+                <input type="text" id="globalSearchInput" onkeyup="filterGlobalSearch()" placeholder="Search equipment, borrower..." 
+                    class="w-full bg-[#E8F5E9]/50 border border-[#A5D6A7] rounded-full py-1.5 pl-9 pr-4 text-xs focus:outline-none focus:ring-2 focus:ring-[#2E7D32] transition">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-[#2E7D32]"></i>
+            </div>
+
+            <!-- Profile Dropdown Button -->
+            <div class="flex items-center space-x-3 pl-2 border-l border-[#A5D6A7]/40">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs font-semibold text-[#1B5E20]">Juan Carlos</p>
+                    <p class="text-[10px] text-[#2E7D32]">BSIT Admin</p>
+                </div>
+                <button onclick="switchView('login')" class="relative group">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" 
+                        alt="User Avatar" class="w-9 h-9 rounded-full border-2 border-[#A5D6A7] object-cover shadow-sm group-hover:border-[#2E7D32] transition">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-white"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 relative">
+
+        <!-- SIDEBAR NAVIGATION -->
+        <aside id="sidebar" class="w-64 bg-[#E8F5E9]/90 backdrop-blur-sm border-r border-[#A5D6A7]/50 flex flex-col justify-between absolute md:static left-0 top-0 bottom-0 z-20 transition-all duration-300 transform -translate-x-full md:translate-x-0 h-[calc(100vh-4rem)]">
+            <div class="p-4 space-y-1 overflow-y-auto">
+                <p class="text-[10px] uppercase tracking-wider font-bold text-[#2E7D32] px-3 mb-2">Main Menu</p>
+                
+                <button id="nav-dashboard" onclick="switchView('dashboard')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold bg-[#A5D6A7]/60 text-[#1B5E20] transition">
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-sm"></i>
+                    <span>Dashboard</span>
+                </button>
+
+                <button id="nav-equipment" onclick="switchView('equipment')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[#2E7D32] hover:bg-[#C8E6C9]/50 hover:text-[#1B5E20] transition">
+                    <i class="fa-solid fa-tractor w-5 text-center text-sm"></i>
+                    <span>Equipment Inventory</span>
+                </button>
+
+                <button id="nav-requests" onclick="switchView('requests')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[#2E7D32] hover:bg-[#C8E6C9]/50 hover:text-[#1B5E20] transition">
+                    <i class="fa-solid fa-[#2E7D32] fa-clipboard-check w-5 text-center text-sm"></i>
+                    <span class="flex-1 text-left">Borrowing Requests</span>
+                    <span class="bg-[#2E7D32] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+                </button>
+
+                <button id="nav-scheduling" onclick="switchView('scheduling')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[#2E7D32] hover:bg-[#C8E6C9]/50 hover:text-[#1B5E20] transition">
+                    <i class="fa-solid fa-calendar-days w-5 text-center text-sm"></i>
+                    <span>Scheduling & Availability</span>
+                </button>
+
+                <button id="nav-records" onclick="switchView('records')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[#2E7D32] hover:bg-[#C8E6C9]/50 hover:text-[#1B5E20] transition">
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center text-sm"></i>
+                    <span>Borrow & Return History</span>
+                </button>
+
+                <p class="text-[10px] uppercase tracking-wider font-bold text-[#2E7D32] px-3 pt-4 mb-2">Management</p>
+
+                <button id="nav-borrowers" onclick="switchView('borrowers')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[#2E7D32] hover:bg-[#C8E6C9]/50 hover:text-[#1B5E20] transition">
+                    <i class="fa-solid fa-users w-5 text-center text-sm"></i>
+                    <span>Borrower Registry</span>
+                </button>
+
+                <button id="nav-reports" onclick="switchView('reports')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[#2E7D32] hover:bg-[#C8E6C9]/50 hover:text-[#1B5E20] transition">
+                    <i class="fa-solid fa-file-invoice w-5 text-center text-sm"></i>
+                    <span>System Reports</span>
+                </button>
+
+                <button id="nav-users" onclick="switchView('users')" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium text-[#2E7D32] hover:bg-[#C8E6C9]/50 hover:text-[#1B5E20] transition">
+                    <i class="fa-solid fa-user-shield w-5 text-center text-sm"></i>
+                    <span>System User Roles</span>
+                </button>
+            </div>
+
+            <!-- Sidebar Footer Banner -->
+            <div class="p-3 border-t border-[#A5D6A7]/40 bg-[#C8E6C9]/30 m-3 rounded-2xl text-center">
+                <i class="fa-solid fa-leaf text-[#2E7D32] mb-1"></i>
+                <p class="text-[11px] font-bold text-[#1B5E20]">CIS 104 Database Project</p>
+                <p class="text-[9px] text-[#2E7D32]">BS Information Technology</p>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEW CONTAINER -->
+        <main class="flex-1 p-4 md:p-6 overflow-y-auto max-h-[calc(100vh-4rem)] space-y-6">
+
+            <!-- 1. DASHBOARD VIEW -->
+            <div id="view-dashboard" class="view-panel space-y-6 page-fade-in">
+                
+                <!-- Welcome Banner with Farm Photo Overlay -->
+                <div class="farm-banner-bg rounded-3xl p-6 text-white shadow-md relative overflow-hidden flex flex-col justify-between min-h-[160px]">
+                    <div class="relative z-10 space-y-2 max-w-xl">
+                        <span class="bg-white/20 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md">AgriBorrow System Active</span>
+                        <h2 class="text-2xl font-bold leading-tight">Welcome back, Admin Juan! 🌿</h2>
+                        <p class="text-xs text-emerald-100 font-light">Monitor agricultural equipment schedules, manage farmer requests, and track pending borrowing status seamlessly.</p>
+                    </div>
+                    <div class="relative z-10 pt-4 flex space-x-3">
+                        <button onclick="openModal('modalBorrow')" class="bg-white text-[#1B5E20] font-semibold text-xs px-4 py-2 rounded-full shadow-sm hover:bg-emerald-50 transition">
+                            <i class="fa-solid fa-plus mr-1"></i> New Borrow Request
+                        </button>
+                        <button onclick="switchView('equipment')" class="bg-white/20 text-white font-medium text-xs px-4 py-2 rounded-full border border-white/30 backdrop-blur-md hover:bg-white/30 transition">
+                            View Equipment Catalog
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-[#A5D6A7]/40 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[11px] font-semibold text-[#2E7D32]">Total Equipment</span>
+                            <div class="w-8 h-8 rounded-xl bg-[#E8F5E9] text-[#2E7D32] flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-toolbox"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-2xl font-bold text-[#1B5E20]">48</p>
+                            <span class="text-[10px] text-emerald-600 font-medium">Registered in DB</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-[#A5D6A7]/40 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[11px] font-semibold text-[#2E7D32]">Available Now</span>
+                            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-2xl font-bold text-emerald-700">32</p>
+                            <span class="text-[10px] text-emerald-600 font-medium">Ready for dispatch</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-[#A5D6A7]/40 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[11px] font-semibold text-[#2E7D32]">Pending Requests</span>
+                            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-2xl font-bold text-amber-700">5</p>
+                            <span class="text-[10px] text-amber-600 font-medium">Requires approval</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-[#A5D6A7]/40 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[11px] font-semibold text-[#2E7D32]">Active Borrowed</span>
+                            <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-[#2E7D32] fa-hand-holding-hand"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-2xl font-bold text-blue-700">11</p>
+                            <span class="text-[10px] text-blue-600 font-medium">In field usage</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-[#A5D6A7]/40 shadow-sm flex flex-col justify-between hover:shadow-md transition col-span-2 md:col-span-1">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[11px] font-semibold text-[#2E7D32]">Overdue Returns</span>
+                            <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-2xl font-bold text-rose-700">2</p>
+                            <span class="text-[10px] text-rose-600 font-medium">Requires notice</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Controls & Equipment Schedule Overview -->
+                <div class="bg-white rounded-3xl border border-[#A5D6A7]/40 shadow-sm overflow-hidden">
+                    <div class="p-4 md:p-5 border-b border-[#A5D6A7]/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#E8F5E9]/30">
+                        <div>
+                            <h3 class="font-bold text-base text-[#1B5E20]">Equipment Status & Inventory</h3>
+                            <p class="text-xs text-[#2E7D32]">Filter equipment records and schedule availability</p>
+                        </div>
+                        
+                        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                            <!-- Search Table -->
+                            <div class="relative flex-1 md:w-56">
+                                <input type="text" id="tableSearchInput" onkeyup="filterEquipmentTable()" placeholder="Search code or equipment..." 
+                                    class="w-full bg-white border border-[#A5D6A7] rounded-xl py-1.5 pl-8 pr-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#2E7D32]">
+                                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-xs text-[#2E7D32]"></i>
+                            </div>
+
+                            <!-- Filter Category -->
+                            <select id="statusFilter" onchange="filterEquipmentTable()" class="bg-white border border-[#A5D6A7] rounded-xl py-1.5 px-3 text-xs text-[#1E3A2B] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]">
+                                <option value="ALL">All Status</option>
+                                <option value="AVAILABLE">Available</option>
+                                <option value="BORROWED">Borrowed</option>
+                                <option value="MAINTENANCE">Maintenance</option>
+                            </select>
+
+                            <button onclick="openModal('modalAddEquipment')" class="btn-pill-green px-3 py-1.5 text-xs font-semibold flex items-center space-x-1">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                                <span>Add Equipment</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Responsive Data Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse" id="equipmentTable">
+                            <thead>
+                                <tr class="bg-[#E8F5E9]/60 border-b border-[#A5D6A7]/40 text-[#1B5E20] font-semibold">
+                                    <th class="p-3.5 pl-5">Code</th>
+                                    <th class="p-3.5">Equipment Name</th>
+                                    <th class="p-3.5">Category</th>
+                                    <th class="p-3.5">Condition</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#A5D6A7]/20 text-[#1E3A2B]">
+                                <tr class="hover:bg-[#E8F5E9]/20 transition">
+                                    <td class="p-3.5 pl-5 font-mono text-xs font-bold text-[#2E7D32]">EQ-1001</td>
+                                    <td class="p-3.5 font-semibold text-[#1B5E20]">Kubota Four-Wheel Tractor 50HP</td>
+                                    <td class="p-3.5">Heavy Machinery</td>
+                                    <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-md font-semibold">Excellent</span></td>
+                                    <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2.5 py-1 rounded-full font-bold">AVAILABLE</span></td>
+                                    <td class="p-3.5 text-center space-x-2">
+                                        <button onclick="openModal('modalBorrow')" class="text-[#2E7D32] hover:text-[#1B5E20] font-medium text-xs bg-[#E8F5E9] px-2.5 py-1 rounded-lg border border-[#A5D6A7]">Borrow</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-[#E8F5E9]/20 transition">
+                                    <td class="p-3.5 pl-5 font-mono text-xs font-bold text-[#2E7D32]">EQ-1002</td>
+                                    <td class="p-3.5 font-semibold text-[#1B5E20]">Yanmar Walk-Behind Transplanter</td>
+                                    <td class="p-3.5">Planting</td>
+                                    <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-md font-semibold">Good</span></td>
+                                    <td class="p-3.5"><span class="bg-blue-100 text-blue-800 text-[10px] px-2.5 py-1 rounded-full font-bold">BORROWED</span></td>
+                                    <td class="p-3.5 text-center space-x-2">
+                                        <button onclick="triggerToast('Item currently borrowed by Farmer Mang Pedro', 'warning')" class="text-gray-400 font-medium text-xs bg-gray-100 px-2.5 py-1 rounded-lg border border-gray-200 cursor-not-allowed">In Use</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-[#E8F5E9]/20 transition">
+                                    <td class="p-3.5 pl-5 font-mono text-xs font-bold text-[#2E7D32]">EQ-1003</td>
+                                    <td class="p-3.5 font-semibold text-[#1B5E20]">Rice Combine Harvester DC-70</td>
+                                    <td class="p-3.5">Harvesting</td>
+                                    <td class="p-3.5"><span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-md font-semibold">Fair</span></td>
+                                    <td class="p-3.5"><span class="bg-amber-100 text-amber-800 text-[10px] px-2.5 py-1 rounded-full font-bold">MAINTENANCE</span></td>
+                                    <td class="p-3.5 text-center space-x-2">
+                                        <button onclick="triggerToast('Equipment under scheduled maintenance', 'warning')" class="text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 font-medium text-xs">Service</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Activities Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-3xl p-5 border border-[#A5D6A7]/40 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-sm text-[#1B5E20]">Recent Borrowing Activity</h3>
+                            <button onclick="switchView('records')" class="text-xs text-[#2E7D32] hover:underline font-medium">View All</button>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#F9FBF8] border border-[#A5D6A7]/30">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                                        MP
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-[#1B5E20]">Mang Pedro Santos</p>
+                                        <p class="text-[10px] text-gray-500">Borrowed Hand Tractor (EQ-1008)</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-semibold">Today, 8:30 AM</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#F9FBF8] border border-[#A5D6A7]/30">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                                        AR
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-[#1B5E20]">Ana Reyes (Cooperative 4)</p>
+                                        <p class="text-[10px] text-gray-500">Returned Irrigation Pump 3-inch</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-semibold">Yesterday</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-5 border border-[#A5D6A7]/40 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-sm text-[#1B5E20]">System Database Notice</h3>
+                            <span class="text-[10px] bg-[#E8F5E9] text-[#2E7D32] px-2 py-0.5 rounded-full font-mono">CIS 104 DB</span>
+                        </div>
+                        <div class="p-3 bg-[#E8F5E9]/50 rounded-2xl border border-[#A5D6A7]/50 text-xs text-[#2E7D32] space-y-2">
+                            <p class="font-medium"><strong>Relational Tables Configured:</strong></p>
+                            <ul class="list-disc list-inside text-[11px] space-y-1">
+                                <li><code>equipment</code>, <code>borrowers</code>, <code>borrowing_records</code></li>
+                                <li>Foreign Key Relationships Enabled</li>
+                                <li>Automatic Overdue Calculations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 2. LOGIN PAGE VIEW -->
+            <div id="view-login" class="view-panel hidden min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 page-fade-in">
+                <div class="bg-white w-full max-w-md rounded-3xl border border-[#A5D6A7]/50 shadow-xl overflow-hidden">
+                    <div class="login-banner-bg p-8 text-center text-white relative">
+                        <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl mx-auto flex items-center justify-center mb-3 border border-white/30">
+                            <i class="fa-solid fa-[#2E7D32] fa-wheat-awn text-2xl text-white"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold">AgriBorrow System</h2>
+                        <p class="text-xs text-emerald-100 mt-1">Database Portal & Equipment Manager</p>
+                    </div>
+
+                    <form onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-[#1B5E20] mb-1">Username / ID</label>
+                            <input type="text" required placeholder="admin" value="admin" 
+                                class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl py-2 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#2E7D32]">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-[#1B5E20] mb-1">Password</label>
+                            <input type="password" required value="••••••••" 
+                                class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl py-2 px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#2E7D32]">
+                        </div>
+
+                        <div class="flex justify-between items-center text-xs">
+                            <label class="flex items-center space-x-2 text-gray-600">
+                                <input type="checkbox" checked class="rounded border-[#A5D6A7] text-[#2E7D32] focus:ring-[#2E7D32]">
+                                <span>Remember me</span>
+                            </label>
+                            <a href="#" class="text-[#2E7D32] font-semibold hover:underline">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="w-full btn-pill-green py-2.5 text-xs font-bold shadow-md">
+                            Sign In to System
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 3. EQUIPMENT MANAGEMENT VIEW -->
+            <div id="view-equipment" class="view-panel hidden space-y-4 page-fade-in">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-[#1B5E20]">Equipment Inventory</h2>
+                        <p class="text-xs text-[#2E7D32]">Manage machinery and farm equipment details in the database</p>
+                    </div>
+                    <button onclick="openModal('modalAddEquipment')" class="btn-pill-green px-4 py-2 text-xs font-bold shadow-sm">
+                        + Add New Equipment
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-[#A5D6A7]/40 shadow-sm text-xs">
+                    <p class="text-[#2E7D32]">Full Equipment Database Table View Ready for Backend PHP/MySQL Connection.</p>
+                </div>
+            </div>
+
+            <!-- 4. BORROWING REQUESTS VIEW -->
+            <div id="view-requests" class="view-panel hidden space-y-4 page-fade-in">
+                <h2 class="text-xl font-bold text-[#1B5E20]">Borrowing Requests Management</h2>
+                <div class="bg-white rounded-2xl p-4 border border-[#A5D6A7]/40 shadow-sm text-xs">
+                    <p class="text-[#2E7D32]">Pending farmer approval requests table.</p>
+                </div>
+            </div>
+
+            <!-- 5. SCHEDULING VIEW -->
+            <div id="view-scheduling" class="view-panel hidden space-y-4 page-fade-in">
+                <h2 class="text-xl font-bold text-[#1B5E20]">Equipment Scheduling Calendar</h2>
+                <div class="bg-white rounded-2xl p-4 border border-[#A5D6A7]/40 shadow-sm text-xs">
+                    <p class="text-[#2E7D32]">Equipment allocation timeline and reservation schedules.</p>
+                </div>
+            </div>
+
+            <!-- 6. RECORDS VIEW -->
+            <div id="view-records" class="view-panel hidden space-y-4 page-fade-in">
+                <h2 class="text-xl font-bold text-[#1B5E20]">Borrowing & Return History Logs</h2>
+                <div class="bg-white rounded-2xl p-4 border border-[#A5D6A7]/40 shadow-sm text-xs">
+                    <p class="text-[#2E7D32]">Historical records of returned and active farm machinery.</p>
+                </div>
+            </div>
+
+            <!-- 7. BORROWERS VIEW -->
+            <div id="view-borrowers" class="view-panel hidden space-y-4 page-fade-in">
+                <h2 class="text-xl font-bold text-[#1B5E20]">Borrower Registry</h2>
+                <div class="bg-white rounded-2xl p-4 border border-[#A5D6A7]/40 shadow-sm text-xs">
+                    <p class="text-[#2E7D32]">Farmer IDs, cooperative affiliations, and contact details.</p>
+                </div>
+            </div>
+
+            <!-- 8. REPORTS VIEW -->
+            <div id="view-reports" class="view-panel hidden space-y-4 page-fade-in">
+                <h2 class="text-xl font-bold text-[#1B5E20]">System Reports & Analytics</h2>
+                <div class="bg-white rounded-2xl p-4 border border-[#A5D6A7]/40 shadow-sm text-xs">
+                    <p class="text-[#2E7D32]">Equipment utilization charts, monthly statistics, and printable summaries.</p>
+                </div>
+            </div>
+
+            <!-- 9. USER MANAGEMENT VIEW -->
+            <div id="view-users" class="view-panel hidden space-y-4 page-fade-in">
+                <h2 class="text-xl font-bold text-[#1B5E20]">System User Management</h2>
+                <div class="bg-white rounded-2xl p-4 border border-[#A5D6A7]/40 shadow-sm text-xs">
+                    <p class="text-[#2E7D32]">Administrator accounts and system permission levels.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL POPUP: ADD NEW BORROW REQUEST -->
+    <div id="modalBorrow" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl border border-[#A5D6A7] shadow-2xl w-full max-w-lg overflow-hidden page-fade-in">
+            <div class="bg-[#E8F5E9] px-6 py-4 border-b border-[#A5D6A7] flex justify-between items-center">
+                <h3 class="font-bold text-[#1B5E20] text-sm">New Borrowing Schedule</h3>
+                <button onclick="closeModal('modalBorrow')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleFormSubmit(event, 'modalBorrow', 'Borrowing Schedule Saved!')" class="p-6 space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-[#1B5E20] mb-1">Select Borrower (Farmer / Association)</label>
+                    <select class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl p-2.5">
+                        <option>Pedro Santos (ID: F-2026-01)</option>
+                        <option>Maria Clara (ID: F-2026-02)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-[#1B5E20] mb-1">Select Agricultural Equipment</label>
+                    <select class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl p-2.5">
+                        <option>EQ-1001 - Kubota Four-Wheel Tractor 50HP</option>
+                        <option>EQ-1004 - Multi-crop Thresher</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-[#1B5E20] mb-1">Borrow Date</label>
+                        <input type="date" required class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl p-2.5">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-[#1B5E20] mb-1">Expected Return Date</label>
+                        <input type="date" required class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl p-2.5">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modalBorrow')" class="btn-pill-sage px-4 py-2">Cancel</button>
+                    <button type="submit" class="btn-pill-green px-5 py-2">Submit Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP: ADD NEW EQUIPMENT -->
+    <div id="modalAddEquipment" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl border border-[#A5D6A7] shadow-2xl w-full max-w-lg overflow-hidden page-fade-in">
+            <div class="bg-[#E8F5E9] px-6 py-4 border-b border-[#A5D6A7] flex justify-between items-center">
+                <h3 class="font-bold text-[#1B5E20] text-sm">Add Equipment to Database</h3>
+                <button onclick="closeModal('modalAddEquipment')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="handleFormSubmit(event, 'modalAddEquipment', 'New Equipment Registered!')" class="p-6 space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-[#1B5E20] mb-1">Equipment Code</label>
+                        <input type="text" placeholder="e.g. EQ-1009" required class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl p-2.5">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-[#1B5E20] mb-1">Category</label>
+                        <select class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl p-2.5">
+                            <option>Heavy Machinery</option>
+                            <option>Planting</option>
+                            <option>Harvesting</option>
+                            <option>Irrigation</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-[#1B5E20] mb-1">Equipment Name / Model</label>
+                    <input type="text" placeholder="e.g. Yanmar Paddy Weeder" required class="w-full bg-[#E8F5E9]/30 border border-[#A5D6A7] rounded-xl p-2.5">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeModal('modalAddEquipment')" class="btn-pill-sage px-4 py-2">Cancel</button>
+                    <button type="submit" class="btn-pill-green px-5 py-2">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+        <div id="toastBody" class="bg-[#2E7D32] text-white px-4 py-3 rounded-2xl shadow-lg flex items-center space-x-3 text-xs font-medium">
+            <i id="toastIcon" class="fa-solid fa-circle-check text-base"></i>
+            <span id="toastMsg">Action completed successfully!</span>
+        </div>
+    </div>
+
+    <!-- Custom JS File Link -->
+    <script src="script.js"></script>
+</body>
+</html>
